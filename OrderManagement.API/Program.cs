@@ -3,6 +3,8 @@ using OrderManagement.Infrastructure.Data;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Application.Services;
 using OrderManagement.Infrastructure.Repositories;
+using OrderManagement.Application.Discounts;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository> ();
 builder.Services.AddScoped<IOrderRepository, OrderRepository> ();
 
 builder.Services.AddScoped<IOrderService, OrderService> ();
+builder.Services.AddScoped<IDiscountStrategyFactory, DiscountStrategyFactory> ();
 
 var app = builder.Build();
 

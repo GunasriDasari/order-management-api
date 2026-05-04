@@ -20,7 +20,9 @@ namespace OrderManagement.API.Controllers
         {
             var order = await _orderService.CreateOrderAsync(
                 request.CustomerId,
-                request.ProductQuantities
+                request.ProductQuantities,
+                request.DiscountType,
+                request.DiscountValue
                 );
             return CreatedAtAction(nameof(GetOrderById), new { id =  order.Id }, order);
         }

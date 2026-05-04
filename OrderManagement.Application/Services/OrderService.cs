@@ -9,15 +9,21 @@ namespace OrderManagement.Application.Services
         private readonly IOrderRepository _orderRepository;
         private readonly IProductRepository _productRepository;
         private readonly ICustomerRepository _customerRepository;
+        private readonly IDiscountStrategyFactory _discountStrategyFactory;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, ICustomerRepository customerRepository)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, ICustomerRepository customerRepository, IDiscountStrategyFactory discountStrategyFactory)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _customerRepository = customerRepository;
+            _discountStrategyFactory = discountStrategyFactory;
         }
 
-        public async Task<Order> CreateOrderAsync(int customerId, Dictionary<int, int> productQuantities)
+        public async Task<Order> CreateOrderAsync(
+            int customerId, 
+            Dictionary<int, int> productQuantities,
+            string? discountType,
+            decimal discountValue)
         {
             var customer = await _customerRepository.GetByIdAsync(customerId);
 
@@ -72,7 +78,7 @@ namespace OrderManagement.Application.Services
                 totalAmount += subTotal;
             }
 
-            IDiscountStrategy discountStrategy = new PercentageDiscountStrategy(10);
+            var discountStrategy = _discountStrategyFactory.GetStrategy(discountType, discountValue);
 
             var finalAmount = discountStrategy.ApplyDiscount(totalAmount);
 
