@@ -1,5 +1,6 @@
 ﻿using OrderManagement.Application.Interfaces;
 using OrderManagement.Domain.Entities;
+using OrderManagement.Application.Discounts;
 
 namespace OrderManagement.Application.Services
 {
@@ -71,7 +72,11 @@ namespace OrderManagement.Application.Services
                 totalAmount += subTotal;
             }
 
-            order.TotalAmount = totalAmount;
+            IDiscountStrategy discountStrategy = new PercentageDiscountStrategy(10);
+
+            var finalAmount = discountStrategy.ApplyDiscount(totalAmount);
+
+            order.TotalAmount = finalAmount;
 
             return await _orderRepository.CreateAsync(order);
         }
