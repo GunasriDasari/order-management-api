@@ -32,6 +32,7 @@ builder.Services.AddScoped<IDiscountStrategyFactory, DiscountStrategyFactory> ()
 var app = builder.Build();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
+app.UseMiddleware<RequestLoggingMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {

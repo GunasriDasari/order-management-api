@@ -1,6 +1,7 @@
 ﻿using OrderManagement.Application.Interfaces;
 using OrderManagement.Domain.Entities;
 using OrderManagement.Application.Discounts;
+using Microsoft.Extensions.Logging;
 
 namespace OrderManagement.Application.Services
 {
@@ -10,13 +11,16 @@ namespace OrderManagement.Application.Services
         private readonly IProductRepository _productRepository;
         private readonly ICustomerRepository _customerRepository;
         private readonly IDiscountStrategyFactory _discountStrategyFactory;
+        private readonly ILogger<OrderService> _logger;
 
-        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, ICustomerRepository customerRepository, IDiscountStrategyFactory discountStrategyFactory)
+        public OrderService(IOrderRepository orderRepository, IProductRepository productRepository, ICustomerRepository customerRepository, IDiscountStrategyFactory discountStrategyFactory, ILogger<OrderService> logger)
         {
             _orderRepository = orderRepository;
             _productRepository = productRepository;
             _customerRepository = customerRepository;
             _discountStrategyFactory = discountStrategyFactory;
+            _logger = logger;
+
         }
 
         public async Task<Order> CreateOrderAsync(
@@ -25,15 +29,19 @@ namespace OrderManagement.Application.Services
             string? discountType,
             decimal discountValue)
         {
+            _logger.LogInformation("Creating order for CustomerId: {CustomerId}", customerId);
+
             var customer = await _customerRepository.GetByIdAsync(customerId);
 
             if(customer == null)
             {
+                _logger.LogWarning("Customer not found. CustomerId: {CustomerId}", customerId);
+
                 throw new Exception("Customer not Found");
             }
 
             if(productQuantities == null || !productQuantities.Any())
-            {
+            { 
                 throw new Exception("Order must contain atleast one product");
             }
 
@@ -55,6 +63,8 @@ namespace OrderManagement.Application.Services
 
                 if(product == null)
                 {
+                    _logger.LogWarning("Product not found. ProductId: {ProductId}", productId);
+
                     throw new Exception($"Product with id {productId} not found");
                 }
 
@@ -84,7 +94,17 @@ namespace OrderManagement.Application.Services
 
             order.TotalAmount = finalAmount;
 
-            return await _orderRepository.CreateAsync(order);
+            _logger.LogInformation(
+                "Order total calculated. OriginalAmount: {OriginalAmount}, FinalAmount: {FinalAmount}, DiscountType: {DiscountType}",
+                totalAmount,
+                finalAmount,
+                discountType);
+
+            var createdOrder = await _orderRepository.CreateAsync(order);
+
+            _logger.LogInformation("Order created successfully. OrderId: {OrderId}", createdOrder.Id);
+
+            return createdOrder;
         }
 
         public async Task<Order?> GetOrderByIdAsync(int id)
