@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Domain.Entities;
+using OrderManagement.Application.DTOs;
 
 namespace OrderManagement.API.Controllers
 {
@@ -16,11 +17,27 @@ namespace OrderManagement.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct(Product product)
+        public async Task<IActionResult> CreateProduct(CreateProductRequest request)
         {
+            var product = new Product
+            {
+                Name = request.Name,
+                Description = request.Description,
+                Price = request.Price,
+                StockQuantity = request.StockQuantity
+            };
+
             var createdProduct = await _productRepository.CreateAsync(product);
 
-            return CreatedAtAction(nameof(GetAllProducts), new { id = createdProduct.Id }, createdProduct);
+            var response = new ProductResponse
+            {
+                Id = createdProduct.Id,
+                Name = createdProduct.Name,
+                Description = createdProduct.Description,
+                Price = createdProduct.Price
+            };
+
+            return CreatedAtAction(nameof(GetAllProducts), new { id = response.Id }, response);
         }
 
         [HttpGet]
@@ -28,7 +45,15 @@ namespace OrderManagement.API.Controllers
         {
             var products = await _productRepository.GetAllAsync();
 
-            return Ok(products);
+            var response = products.Select(product => new ProductResponse
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price
+            });
+
+            return Ok(response);
         }
     }
 }

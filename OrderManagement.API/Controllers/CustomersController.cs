@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using OrderManagement.Application.Interfaces;
 using OrderManagement.Domain.Entities;
+using OrderManagement.Application.DTOs;
 
 namespace OrderManagement.API.Controllers
 {
@@ -17,13 +17,25 @@ namespace OrderManagement.API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateCustomer(Customer customer)
+        public async Task<IActionResult> CreateCustomer(CreateCustomerRequest request)
         {
+            var customer = new Customer
+            {
+                Name = request.Name,
+                Email = request.Email
+            };
+
             var createdCustomer = await _customerRepository.CreateAsync(customer);
 
-            return CreatedAtAction(nameof(GetCustomerById), new { id = createdCustomer.Id }, createdCustomer);
-        }
+            var response = new CustomerResponse
+            {
+                Id = createdCustomer.Id,
+                Name = createdCustomer.Name,
+                Email = createdCustomer.Email
+            };
 
+            return CreatedAtAction(nameof(GetCustomerById), new { id = response.Id }, response);
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetCustomerById(int id)
         {
@@ -34,7 +46,14 @@ namespace OrderManagement.API.Controllers
                 return NotFound();
             }
 
-            return Ok(customer);
+            var response = new CustomerResponse
+            {
+                Id = customer.Id,
+                Name = customer.Name,
+                Email = customer.Email
+            };
+
+            return Ok(response);
         }
     }
 }

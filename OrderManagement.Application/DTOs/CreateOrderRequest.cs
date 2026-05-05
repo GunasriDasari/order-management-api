@@ -1,4 +1,4 @@
-﻿namespace OrderManagement.API.Models
+﻿namespace OrderManagement.Application.DTOs
 {
     public class CreateOrderRequest
     {
