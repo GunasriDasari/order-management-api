@@ -4,6 +4,7 @@ using OrderManagement.Application.Interfaces;
 using OrderManagement.Application.Services;
 using OrderManagement.Infrastructure.Repositories;
 using OrderManagement.Application.Discounts;
+using OrderManagement.API.Middleware;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +30,8 @@ builder.Services.AddScoped<IOrderService, OrderService> ();
 builder.Services.AddScoped<IDiscountStrategyFactory, DiscountStrategyFactory> ();
 
 var app = builder.Build();
+
+app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
