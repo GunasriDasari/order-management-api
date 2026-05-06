@@ -37,7 +37,7 @@ namespace OrderManagement.API.Controllers
                 Price = createdProduct.Price
             };
 
-            return CreatedAtAction(nameof(GetAllProducts), new { id = response.Id }, response);
+            return StatusCode(StatusCodes.Status201Created, response);
         }
 
         [HttpGet]

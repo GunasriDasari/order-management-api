@@ -37,12 +37,12 @@ namespace OrderManagement.Application.Services
             {
                 _logger.LogWarning("Customer not found. CustomerId: {CustomerId}", customerId);
 
-                throw new Exception("Customer not Found");
+                throw new KeyNotFoundException("Customer not found.");
             }
 
             if(productQuantities == null || !productQuantities.Any())
-            { 
-                throw new Exception("Order must contain atleast one product");
+            {
+                throw new ArgumentException("Order must contain at least one product.");
             }
 
             var order = new Order
@@ -61,16 +61,20 @@ namespace OrderManagement.Application.Services
 
                 var product = await _productRepository.GetByIdAsync(productId);
 
-                if(product == null)
+                if (product == null)
                 {
                     _logger.LogWarning("Product not found. ProductId: {ProductId}", productId);
-
-                    throw new Exception($"Product with id {productId} not found");
+                    throw new KeyNotFoundException($"Product with id {productId} not found.");
                 }
 
-                if(quantity <= 0)
+                if (quantity <= 0)
                 {
-                    throw new Exception("Quantiry must be greater than zero");
+                    throw new ArgumentException("Quantity must be greater than zero.");
+                }
+
+                if (product.StockQuantity < quantity)
+                {
+                    throw new InvalidOperationException($"Not enough stock for product {product.Name}.");
                 }
 
                 var subTotal = product.Price * quantity;

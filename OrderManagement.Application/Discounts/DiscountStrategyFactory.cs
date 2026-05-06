@@ -1,12 +1,10 @@
-﻿
-
-namespace OrderManagement.Application.Discounts
+﻿namespace OrderManagement.Application.Discounts
 {
     public class DiscountStrategyFactory : IDiscountStrategyFactory
     {
         public IDiscountStrategy GetStrategy(string? discountType, decimal discountValue)
         {
-            if(string.IsNullOrWhiteSpace(discountType))
+            if (string.IsNullOrWhiteSpace(discountType))
             {
                 return new NoDiscountStrategy();
             }
@@ -15,7 +13,7 @@ namespace OrderManagement.Application.Discounts
             {
                 "percentage" => new PercentageDiscountStrategy(discountValue),
                 "none" => new NoDiscountStrategy(),
-                _ => new NoDiscountStrategy()
+                _ => throw new ArgumentException("Invalid discount type.")
             };
         }
     }

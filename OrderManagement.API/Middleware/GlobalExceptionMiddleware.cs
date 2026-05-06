@@ -22,15 +22,28 @@ namespace OrderManagement.API.Middleware
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An Unexpected error occured");
+                _logger.LogError(ex, "An error occured while processing the request.");
 
-                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.ContentType = "application/json";
+
+                context.Response.StatusCode = ex switch
+                {
+                    ArgumentException => StatusCodes.Status400BadRequest,
+                    KeyNotFoundException => StatusCodes.Status404NotFound,
+                    InvalidOperationException => StatusCodes.Status400BadRequest,
+                    _ => StatusCodes.Status500InternalServerError
+                };
 
                 var response = new
                 {
                     statusCode = context.Response.StatusCode,
-                    message = "Something went wrong. Please try again later."
+                    message = ex switch
+                    {
+                        ArgumentException => ex.Message,
+                        KeyNotFoundException => ex.Message,
+                        InvalidOperationException => ex.Message,
+                        _ => "Something went wrong. Please try again later."
+                    }
                 };
 
                 var jsonResponse = JsonSerializer.Serialize(response);
