@@ -20,7 +20,7 @@ I have implemented:
 
 ## Architecture
 
-The solution has 4 Layers :
+The solution have 4 Layers :
 - API
 - Application
 - Domain

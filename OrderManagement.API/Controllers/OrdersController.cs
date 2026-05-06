@@ -2,12 +2,9 @@
 using OrderManagement.Application.DTOs;
 using OrderManagement.Application.Services;
 using OrderManagement.Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
 
 namespace OrderManagement.API.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("orders")]
     public class OrdersController : ControllerBase
@@ -24,16 +21,10 @@ namespace OrderManagement.API.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder(CreateOrderRequest request)
         {
-            var customerId = int.Parse(
-                User.FindFirst(ClaimTypes.NameIdentifier)!.Value
-                );
-            _logger.LogInformation(
-                "Create order request received for CustomerId: {CustomerId}",
-                customerId
-            );
+            _logger.LogInformation("Create order request received for CustomerId: {CustomerId}", request.CustomerId);
 
             var order = await _orderService.CreateOrderAsync(
-                customerId,
+                request.CustomerId,
                 request.ProductQuantities,
                 request.DiscountType,
                 request.DiscountValue

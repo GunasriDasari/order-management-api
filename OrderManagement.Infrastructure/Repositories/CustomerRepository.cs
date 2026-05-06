@@ -27,11 +27,5 @@ namespace OrderManagement.Infrastructure.Repositories
                 .Include(c => c.Orders)
                 .FirstOrDefaultAsync(c => c.Id == id);
         }
-
-        public async Task<Customer?> GetByEmailAsync(string email)
-        {
-            return await _context.Customers
-                .FirstOrDefaultAsync(c => c.Email == email);
-        }
     }
 }
