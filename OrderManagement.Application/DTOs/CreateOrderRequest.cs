@@ -4,8 +4,6 @@ namespace OrderManagement.Application.DTOs
 {
     public class CreateOrderRequest
     {
-        [Range(1, int.MaxValue)]
-        public int CustomerId { get; set; }
 
         [Required]
         [MinLength(1, ErrorMessage = "Order must contain at least one product.")]

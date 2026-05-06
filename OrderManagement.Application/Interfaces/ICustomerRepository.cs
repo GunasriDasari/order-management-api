@@ -7,5 +7,7 @@ namespace OrderManagement.Application.Interfaces
         Task<Customer> CreateAsync(Customer customer);
 
         Task<Customer?> GetByIdAsync(int id);
+
+        Task<Customer?> GetByEmailAsync(string email);
     }
 }
